@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="d04a7d50-dc15-4688-891d-8e36bc291890" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<os:object-store name="sandeep-Object_store" doc:name="Object store" doc:id="e0be6cf5-af0d-4bd4-b07b-8d4f81d44cd3" />
+	<flow name="object-store-usecaseFlow" doc:id="25956e40-b6a3-4384-952c-edc85d2a82aa" >
+		<http:listener doc:name="/storeGET" doc:id="592db012-7e1f-46be-8cba-5349d2bc7080" config-ref="HTTP_Listener_config" path="/store" allowedMethods="GET"/>
+		<set-variable value="#[attributes.queryParams.key]" doc:name="Set Variable" doc:id="7e14e625-ba14-4178-80b2-4ebb8a7503a9" variableName="key"/>
+		<set-variable value="#[attributes.queryParams.value]" doc:name="Set Variable" doc:id="05665b2d-bd52-45fe-ba65-0ec24b647764" variableName="value"/>
+		<os:store doc:name="Store key value to object store" doc:id="3c915d7a-1761-427c-86ea-2377fa050d31" key="#[vars.key]" objectStore="sandeep-Object_store">
+			<os:value ><![CDATA[#[vars.value]]]></os:value>
+		</os:store>
+		<logger level="INFO" doc:name="Logger" doc:id="c3acbdf0-8f15-4dbf-9035-408082347075" message="stored key and values"/>
+	</flow>
+	<flow name="object-store-usecaseFlow1" doc:id="3a8b42cc-92e3-4802-9cd3-acc801105128" >
+		<http:listener doc:name="Listener" doc:id="bc5c1161-2787-47d4-9c9f-7b08d9641cec" config-ref="HTTP_Listener_config" path="/retreive" allowedMethods="GET"/>
+		<set-variable value="#[attributes.queryParams.key]" doc:name="Set Variable" doc:id="6d1f20ab-1661-4f66-a250-7ac60e68f3da" variableName="key"/>
+		<os:retrieve doc:name="Retrieve" doc:id="72585e9f-fcae-44c3-a66b-6b146f2f2dcc" objectStore="sandeep-Object_store" key="#[vars.key]">
+		</os:retrieve>
+		<logger level="INFO" doc:name="Logger" doc:id="01e4c5da-9092-4710-b133-99cdfcd7bc52" message="key retreived"/>
+	</flow>
+</mule>
